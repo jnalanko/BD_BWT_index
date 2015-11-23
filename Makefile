@@ -17,10 +17,10 @@ dbwt_objects = $(patsubst %.c, %.o, $(dbwt_sources))
 
 .PHONY: clean
 
+all: tests
+
 # Include header dependencies
 -include $(objects:%.o=%.d)
-
-all: tests
 
 # Map object files to source files. " | build " is an order-only prerequisite meaning
 # that the build directory must exist before building objects, but
