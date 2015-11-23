@@ -56,7 +56,7 @@ vector<string> all_binary_strings_up_to(int k){
 }
 
 
-bool test_suffix_link_tree_iteration(BD_BWT_index<sdsl::bit_vector>& index, string& s){
+bool test_suffix_link_tree_iteration(const BD_BWT_index<sdsl::bit_vector>& index, string& s){
     BD_BWT_index_iterator<sdsl::bit_vector> it(&index);
     set<string> labels;
     while(it.next()){
@@ -67,7 +67,7 @@ bool test_suffix_link_tree_iteration(BD_BWT_index<sdsl::bit_vector>& index, stri
     return (labels == get_right_maximal_substrings(s));       
 }
 
-bool test_backward_step(BD_BWT_index<sdsl::bit_vector>& index, const string& s){
+bool test_backward_step(const BD_BWT_index<sdsl::bit_vector>& index, const string& s){
     BD_BWT_index_iterator<sdsl::bit_vector> it(&index);
     string s_with_end = s + (char)BD_BWT_index<sdsl::bit_vector>::END;
     int64_t n = s_with_end.size();
@@ -80,7 +80,7 @@ bool test_backward_step(BD_BWT_index<sdsl::bit_vector>& index, const string& s){
     return true;
 }
 
-bool test_forward_step(BD_BWT_index<sdsl::bit_vector>& index, const string& s){
+bool test_forward_step(const BD_BWT_index<sdsl::bit_vector>& index, const string& s){
     BD_BWT_index_iterator<sdsl::bit_vector> it(&index);
     string s_with_end = s + (char)BD_BWT_index<sdsl::bit_vector>::END;
     int64_t n = s_with_end.size();

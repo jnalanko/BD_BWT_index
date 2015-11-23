@@ -63,32 +63,32 @@ void get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I, int_vector
 
 // Takes a backward step in the forward bwt
 template<class t_bitvector>
-int64_t BD_BWT_index<t_bitvector>::backward_step(int64_t lex_rank){
+int64_t BD_BWT_index<t_bitvector>::backward_step(int64_t lex_rank) const{
     uint8_t c = forward_bwt[lex_rank];
     return cumulative_char_count[c] + forward_bwt.rank(lex_rank, c);
 }
 
 // Takes a backward step in the reverse bwt
 template<class t_bitvector>
-int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank){
+int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank) const{
     uint8_t c = reverse_bwt[colex_rank];
     return cumulative_char_count[c] + reverse_bwt.rank(colex_rank, c);
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c){
+Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c) const{
     int64_t cumul_rank_c = compute_cumulative_char_rank_in_interval(forward_bwt, alphabet, c, intervals.forward);
     return left_extend(intervals,c,cumul_rank_c);
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c){
+Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c) const{
     int64_t cumul_rank_c = compute_cumulative_char_rank_in_interval(reverse_bwt, alphabet, c, intervals.reverse);
     return right_extend(intervals,c,cumul_rank_c);
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c, int64_t cumul_rank_c){
+Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c, int64_t cumul_rank_c) const{
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
     
@@ -110,7 +110,7 @@ Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, ch
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c){
+Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c) const{
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
     
@@ -154,7 +154,7 @@ void count_smaller_chars(const wt_huff<t_bitvector>& bwt, vector<uint8_t>& alpha
 }
 
 template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I){
+bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I) const{
     
     // An interval is right-maximal iff it has more than one possible right extension
     vector<uint8_t> symbols = get_interval_symbols(reverse_bwt, I.reverse);
@@ -162,7 +162,7 @@ bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I){
 }
 
 template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I){
+bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I) const{
     
     // An interval is left-maximal iff it has more than one possible left extension
     vector<uint8_t> symbols = get_interval_symbols(forward_bwt, I.forward);
@@ -242,7 +242,7 @@ bool allDistinct(const wt_huff<t_bitvector>& bwt, Interval I){
 }
 
 template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::interval_is_supermaximal(Interval_pair I){
+bool BD_BWT_index<t_bitvector>::interval_is_supermaximal(Interval_pair I) const{
     return allDistinct(forward_bwt,I.forward) && allDistinct(reverse_bwt,I.reverse);
 }
 

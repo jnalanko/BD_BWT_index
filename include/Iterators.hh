@@ -26,7 +26,7 @@ public:
         Stack_frame(){}
     };
     
-    BD_BWT_index<t_bitvector>* index;
+    const BD_BWT_index<t_bitvector>* index;
     
     // Iteration state
     std::deque<Stack_frame> iteration_stack;
@@ -36,7 +36,7 @@ public:
     // Reused space between iterations
     std::vector<int64_t> char_counts;
     
-    BD_BWT_index_iterator(BD_BWT_index<t_bitvector>* index) : index(index), char_counts(256) {
+    BD_BWT_index_iterator(const BD_BWT_index<t_bitvector>* index) : index(index), char_counts(256) {
         Interval empty_string(0,index->size()-1);
         iteration_stack.push_back(Stack_frame(Interval_pair(empty_string,empty_string), 0, 0));
         current = iteration_stack.back();

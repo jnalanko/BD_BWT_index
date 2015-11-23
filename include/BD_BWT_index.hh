@@ -28,39 +28,39 @@ private:
     std::vector<int64_t> cumulative_char_count;
     std::vector<uint8_t> alphabet;
     
-    Interval_pair left_extend(Interval_pair intervals, char c, int64_t cumul_rank_c);
-    Interval_pair right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c);
+    Interval_pair left_extend(Interval_pair intervals, char c, int64_t cumul_rank_c) const;
+    Interval_pair right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c) const;
 public:
 
     // The input string must not contain the END byte
     static const uint8_t END = 0x01; // End of string marker.
     BD_BWT_index(const uint8_t* input);
     
-    int64_t size() { return forward_bwt.size(); }
-    uint8_t forward_bwt_at(int64_t index) { return forward_bwt[index]; }
-    uint8_t backward_bwt_at(int64_t index) { return reverse_bwt[index]; }
-    std::vector<int64_t> get_cumulative_char_count() { return cumulative_char_count; }
-    const std::vector<uint8_t>& get_alphabet() { return alphabet; }
+    int64_t size() const { return forward_bwt.size();}
+    uint8_t forward_bwt_at(int64_t index) const { return forward_bwt[index]; }
+    uint8_t backward_bwt_at(int64_t index) const { return reverse_bwt[index]; }
+    std::vector<int64_t> get_cumulative_char_count() const { return cumulative_char_count; }
+    const std::vector<uint8_t>& get_alphabet() const { return alphabet; }
 
     // Returns an interval of size zero if extension not possible or if the given interval has size 0
-    Interval_pair left_extend(Interval_pair intervals, char c);
+    Interval_pair left_extend(Interval_pair intervals, char c) const;
 
     // Returns an interval of size zero if extension not possible or if the given interval has size 0
-    Interval_pair right_extend(Interval_pair intervals, char c);
+    Interval_pair right_extend(Interval_pair intervals, char c) const;
 
     // Let s be a suffix of length k with lexicographic rank lex_rank among all suffixes of the input string.
     // Returns the lexicographic rank of the suffix with length k+1 if k is not equal to the length of the
     // input string counting the terminating symbol, or the lexicographic rank of the suffix with length 0 otherwise.
-    int64_t backward_step(int64_t lex_rank);
+    int64_t backward_step(int64_t lex_rank) const;
     
     // Let s be a prefix of length k with colexicographic rank colex_rank among all prefixes of the input string.
     // Returns the colexicographical rank of the prefix with length k+1 if k is not equal to the length of the
     // input string counting the terminating symbol, or the colexicographic rank of the prefix with length 0 otherwise.
-    int64_t forward_step(int64_t colex_rank);
+    int64_t forward_step(int64_t colex_rank) const;
     
-    bool is_right_maximal(Interval_pair I);
-    bool is_left_maximal(Interval_pair I);
-    bool interval_is_supermaximal(Interval_pair I);
+    bool is_right_maximal(Interval_pair I) const;
+    bool is_left_maximal(Interval_pair I) const;
+    bool interval_is_supermaximal(Interval_pair I) const;
 
 };
 
