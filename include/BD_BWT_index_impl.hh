@@ -63,9 +63,16 @@ void get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I, int_vector
 
 // Takes a backward step in the forward bwt
 template<class t_bitvector>
-int64_t BD_BWT_index<t_bitvector>::backward_step(int64_t pos){
-    uint8_t c = forward_bwt[pos];
-    return cumulative_char_count[c] + forward_bwt.rank(pos, c);
+int64_t BD_BWT_index<t_bitvector>::backward_step(int64_t lex_rank){
+    uint8_t c = forward_bwt[lex_rank];
+    return cumulative_char_count[c] + forward_bwt.rank(lex_rank, c);
+}
+
+// Takes a backward step in the reverse bwt
+template<class t_bitvector>
+int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank){
+    uint8_t c = reverse_bwt[colex_rank];
+    return cumulative_char_count[c] + reverse_bwt.rank(colex_rank, c);
 }
 
 template<class t_bitvector>
@@ -209,9 +216,7 @@ BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input){
 
     uint8_t* forward_transform = bwt_dbwt(forward,n,END);
     free(forward);
-    
-    //for(int i = 0; i < n+1; i++) cout << (int)forward_transform[i] << " "; cout << endl;
-    
+        
     uint8_t* backward_transform = bwt_dbwt(backward,n,END);
     free(backward);
     

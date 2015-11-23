@@ -9,6 +9,12 @@
 #include <string>
 #include "Interval.hh"
 
+/*
+ * Implements a bidictional BWT index.
+ * All indices and ranks are indexed starting from zero.
+ * All intervals are inclusive, i.e. the interval from i to j includes both i and j.
+ */
+
 // Bidirectional BWT index
 template<class t_bitvector>
 class BD_BWT_index{
@@ -42,8 +48,16 @@ public:
     // Returns an interval of size zero if extension not possible or if the given interval has size 0
     Interval_pair right_extend(Interval_pair intervals, char c);
 
-    int64_t backward_step(int64_t pos);
-
+    // Let s be a suffix of length k with lexicographic rank lex_rank among all suffixes of the input string.
+    // Returns the lexicographic rank of the suffix with length k+1 if k is not equal to the length of the
+    // input string counting the terminating symbol, or the lexicographic rank of the suffix with length 0 otherwise.
+    int64_t backward_step(int64_t lex_rank);
+    
+    // Let s be a prefix of length k with colexicographic rank colex_rank among all prefixes of the input string.
+    // Returns the colexicographical rank of the prefix with length k+1 if k is not equal to the length of the
+    // input string counting the terminating symbol, or the colexicographic rank of the prefix with length 0 otherwise.
+    int64_t forward_step(int64_t colex_rank);
+    
     bool is_right_maximal(Interval_pair I);
     bool is_left_maximal(Interval_pair I);
     bool interval_is_supermaximal(Interval_pair I);
