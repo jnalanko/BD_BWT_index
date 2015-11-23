@@ -3,8 +3,6 @@
 #include "Iterators.hh"
 #include <iostream>
 
-using namespace std;
-
 template<class t_bitvector>
 void BD_BWT_index_iterator<t_bitvector>::push_right_maximal_children(Stack_frame f){
     for(uint8_t c : index->get_alphabet()){

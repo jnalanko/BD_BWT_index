@@ -15,11 +15,11 @@
  * All intervals are inclusive, i.e. the interval from i to j includes both i and j.
  */
 
-// Bidirectional BWT index
 template<class t_bitvector>
 class BD_BWT_index{
-private:
     
+private:
+        
     sdsl::wt_huff<t_bitvector> forward_bwt;
     sdsl::wt_huff<t_bitvector> reverse_bwt;
     

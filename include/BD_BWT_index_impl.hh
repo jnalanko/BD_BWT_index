@@ -11,11 +11,8 @@
 #include "malloc.h"
 #include "tools.hh"
 
-using namespace sdsl;
-using namespace std;
-
 template<class t_bitvector>
-int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(const wt_huff<t_bitvector>& wt, char c, Interval I) const{
+int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, char c, Interval I) const{
     int64_t ans = 0;
     if(I.size() == 0) return 0;
     
@@ -29,16 +26,16 @@ int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(cons
 
 
 template<class t_bitvector>
-vector<uint8_t> BD_BWT_index<t_bitvector>::get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I) const{
+std::vector<uint8_t> BD_BWT_index<t_bitvector>::get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I) const{
     if(I.size() == 0){
-        vector<uint8_t> empty;
+        std::vector<uint8_t> empty;
         return empty;
     }
     
-    int_vector_size_type nExtensions;
-    vector<uint8_t> symbols(wt.sigma);
-    vector<uint64_t> ranks_i(wt.sigma);
-    vector<uint64_t> ranks_j(wt.sigma);
+    sdsl::int_vector_size_type nExtensions;
+    std::vector<uint8_t> symbols(wt.sigma);
+    std::vector<uint64_t> ranks_i(wt.sigma);
+    std::vector<uint64_t> ranks_j(wt.sigma);
     wt.interval_symbols(I.left, I.right+1, nExtensions, symbols, ranks_i, ranks_j);
     while(symbols.size() > nExtensions) symbols.pop_back();
     return symbols;
@@ -50,8 +47,8 @@ vector<uint8_t> BD_BWT_index<t_bitvector>::get_interval_symbols(const wt_huff<t_
 // to ranks_i and ranks_j. Important: All the parameter vectors must have length at least equal to the size
 // of the alphabet of the given wavelet tree. Symbols is not sorted
 template<class t_bitvector>
-void BD_BWT_index<t_bitvector>::get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, vector<uint8_t>& symbols,
- vector<uint64_t>& ranks_i, vector<uint64_t>& ranks_j) const{
+void BD_BWT_index<t_bitvector>::get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, std::vector<uint8_t>& symbols,
+ std::vector<uint64_t>& ranks_i, std::vector<uint64_t>& ranks_j) const{
     if(I.size() == 0){
         nExtensions = 0;
         return;
@@ -138,7 +135,7 @@ Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, c
 // Assumes alphabet is sorted
 // Counts = vector with 256 elements
 template<class t_bitvector>
-void BD_BWT_index<t_bitvector>::count_smaller_chars(const wt_huff<t_bitvector>& bwt, vector<uint8_t>& alphabet, vector<int64_t>& counts, Interval I) const{
+void BD_BWT_index<t_bitvector>::count_smaller_chars(const sdsl::wt_huff<t_bitvector>& bwt, std::vector<uint8_t>& alphabet, std::vector<int64_t>& counts, Interval I) const{
     assert(alphabet.size() != 0);
     counts[alphabet[0]] = 0;
     if(I.size() == 0){
@@ -157,7 +154,7 @@ template<class t_bitvector>
 bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I) const{
     
     // An interval is right-maximal iff it has more than one possible right extension
-    vector<uint8_t> symbols = get_interval_symbols(reverse_bwt, I.reverse);
+    std::vector<uint8_t> symbols = get_interval_symbols(reverse_bwt, I.reverse);
     return (symbols.size() >= 2);
 }
 
@@ -165,21 +162,21 @@ template<class t_bitvector>
 bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I) const{
     
     // An interval is left-maximal iff it has more than one possible left extension
-    vector<uint8_t> symbols = get_interval_symbols(forward_bwt, I.forward);
+    std::vector<uint8_t> symbols = get_interval_symbols(forward_bwt, I.forward);
     return (symbols.size() >= 2);
 }
 
 // Returns the alphabet in sorted order
 template<class t_bitvector>
-vector<uint8_t> BD_BWT_index<t_bitvector>::get_string_alphabet(const uint8_t* s) const{
+std::vector<uint8_t> BD_BWT_index<t_bitvector>::get_string_alphabet(const uint8_t* s) const{
     
-    vector<bool> found(256,false);
+    std::vector<bool> found(256,false);
     while(*s != 0){
         found[*s] = true;
         s++;
     }
 
-    vector<uint8_t> alphabet;
+    std::vector<uint8_t> alphabet;
     for(int i = 0; i < 256; i++){
         if(found[i]) alphabet.push_back((uint8_t)i);
     }
@@ -200,8 +197,8 @@ BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input){
     if(*input == 0) throw std::runtime_error("Tried to construct BD_BWT_index for an empty string");
     int64_t n = strlen(input);
     
-    if(find(input, input+n, END) != input + n){
-        stringstream error;
+    if(std::find(input, input+n, END) != input + n){
+        std::stringstream error;
         error << "Input string contains forbidden byte " << std::hex << END;
         throw std::runtime_error(error.str());
     }
