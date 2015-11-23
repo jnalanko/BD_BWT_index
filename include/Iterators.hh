@@ -1,8 +1,6 @@
 #ifndef ITERATORS_HH
 #define ITERATORS_HH
 
-#include <sdsl/suffix_arrays.hpp>
-#include <sdsl/suffix_array_algorithm.hpp>
 #include "BD_BWT_index.hh"
 #include <algorithm>
 

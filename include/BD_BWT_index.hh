@@ -1,11 +1,9 @@
 #ifndef SDSL_ITERATE_HH
 #define SDSL_ITERATE_HH
 
-#include <sdsl/suffix_arrays.hpp>
-#include <sdsl/suffix_array_algorithm.hpp>
+#include <sdsl/construct.hpp>
 #include <vector>
 #include <utility>
-#include <deque>
 #include <string>
 #include "bwt.hh"
 #include "Interval.hh"
