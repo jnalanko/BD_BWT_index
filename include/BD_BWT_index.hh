@@ -24,7 +24,7 @@ private:
     Interval_pair right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c);
 public:
     
-    BD_BWT_index(std::string& input);
+    BD_BWT_index(const std::string& input);
     
     int64_t size() { return forward_bwt.size(); }
     char forward_bwt_at(int64_t index) { return forward_bwt[index]; }

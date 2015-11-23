@@ -176,8 +176,8 @@ vector<uint8_t> get_string_alphabet(const string& s){
 }
 
 template<class t_bitvector>
-BD_BWT_index<t_bitvector>::BD_BWT_index(string& input){
-    
+BD_BWT_index<t_bitvector>::BD_BWT_index(const string& input){
+    if(input == "") throw std::runtime_error("Tried to construct BD_BWT_index for an empty string");
     this->alphabet = get_string_alphabet(input);
     
     // If the dollar is not in the input already, add it to the alphabet

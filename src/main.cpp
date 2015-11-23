@@ -66,6 +66,7 @@ int main(int argc, char** argv){
     
     vector<string> test_set = all_binary_strings_up_to(10);
     for(auto& s : test_set){
+        if(s == "") continue;
         cout << s << endl;
         assert(test_suffix_link_tree_iteration(s));
     }
