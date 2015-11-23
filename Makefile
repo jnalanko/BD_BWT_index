@@ -1,17 +1,21 @@
-dbwtSrc=dbwt/dbwt.c dbwt/dbwt_queue.c dbwt/dbwt_utils.c dbwt/sais.c
-lib_paths=-L lib/sdsl/build/lib -L lib/sdsl/build/external/libdivsufsort/lib/ -L lib
-includes=-I lib/sdsl/include -I lib/sdsl/build/external/libdivsufsort/include -I src -I dbwt
-cppflags = -std=c++11 -O3 -MMD
 sources = main.cpp bwt.cpp tools.cpp
-link = -pthread -fopenmp -ldbwt -ldivsufsort64 -lsdsl
+dbwt_sources=dbwt/dbwt.c dbwt/dbwt_queue.c dbwt/dbwt_utils.c dbwt/sais.c
+lib_paths=-L sdsl-lite/build/lib -L sdsl-lite/build/external/libdivsufsort/lib/ -L lib
+includes=-I sdsl-lite/include -I sdsl-lite/build/external/libdivsufsort/include -I include -I dbwt
+cxxflags = -std=c++11 -O3 -MMD
+ccflags = -std=c99 -O3 -g -MMD
+link = -pthread -fopenmp -ldivsufsort64 -lsdsl
 
 # Search directory for source files
-VPATH=src
+VPATH=src:dbwt
 
 # Substitute .cpp with .o
-objects = $(patsubst %.cpp,build/%.o,$(sources)) 
+objects = $(patsubst %.cpp, build/%.o, $(sources)) 
 
-.PHONY: directories clean
+# Substitute .c with .o
+dbwt_objects = $(patsubst %.c, %.o, $(dbwt_sources)) 
+
+.PHONY: clean
 
 # Include header dependencies
 -include $(objects:%.o=%.d)
@@ -22,21 +26,20 @@ all: tests
 # that the build directory must exist before building objects, but
 # the objects should must not be rebuilt if the timestamp of the build
 # directory changes, which happens every time a file is modified in the directory.
-build/%.o : %.cpp
-	$(CXX) -c $< $(cppFlags) $(includes) -o $@
-
-directories:
-	@mkdir build -p
-	@mkdir include -p
-	@mkdir lib -p
-
-tests: $(objects)
-	$(CXX)  $(cppFlags) $(objects) tests.cpp $(link) -o tests
+build/%.o : %.cpp | build
+	$(CXX) -c $< $(cxxflags) $(includes) -o $@
 	
-dbwt:
-	gcc -std=c99 -O3 -g $(dbwtSrc) -I ./dbwt -c
-	ar rcs lib/libdbwt.a *.o
-	rm *.o
+dbwt/%.o: dbwt/%.c
+	$(CC) $(ccflags) -I dbwt -c $< -o $@
 
+build:
+	@mkdir build -p
+	
+tests: $(objects) $(dbwt_objects)
+	$(CXX) $(objects) $(dbwt_objects) $(lib_paths) $(link) -o tests
+	
 clean:
-	rm build/*
+	rm build/*.o
+	rm build/*.d
+	rm dbwt/*.o
+	rm dbwt/*.d
