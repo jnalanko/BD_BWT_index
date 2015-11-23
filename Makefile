@@ -1,4 +1,4 @@
-sources = main.cpp bwt.cpp tools.cpp
+sources = main.cpp bwt.cpp io_tools.cpp
 dbwt_sources=dbwt/dbwt.c dbwt/dbwt_queue.c dbwt/dbwt_utils.c dbwt/sais.c
 lib_paths=-L sdsl-lite/build/lib -L sdsl-lite/build/external/libdivsufsort/lib/ -L lib
 includes=-I sdsl-lite/include -I sdsl-lite/build/external/libdivsufsort/include -I include -I dbwt

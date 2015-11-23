@@ -1,4 +1,4 @@
-#include "tools.hh"
+#include "io_tools.hh"
 #include <string>
 #include <cassert>
 #include <ctime>
@@ -8,43 +8,6 @@
 #include <cerrno>
 
 using namespace std;
-
-int64_t binaryToInt(string binary){
-    // Assume most significant bit first
-
-    int64_t result = 0;
-    assert(binary.size() <= 64);
-    for(int i = 0; i < binary.size(); i++){
-        char c = binary[binary.size() - 1 - i];
-        assert(c == '0' || c == '1');
-        if(c == '1') result += ((int64_t)1 << i);
-    }
-    return result;
-}
-
-
-string getTimeString(){
-    std::time_t result = std::time(NULL);
-    string time = std::asctime(std::localtime(&result));
-    return time.substr(0,time.size() - 1); // Trim the trailing newline
-}
-
-int64_t getUnixEpoch(){
-    auto time = std::chrono::system_clock::now().time_since_epoch();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
-}
-
-void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-}
-
-void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-}
-
-void trim(std::string &s) {
-    ltrim(s); rtrim(s);
-}
 
 void write_to_disk(string& text, string filepath){
     ofstream stream(filepath);

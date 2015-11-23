@@ -1,7 +1,6 @@
 #include "bwt.hh"
 #include <cstring>
 #include <iostream>
-#include "tools.hh"
 #include <fstream>
 #include <string>
 
