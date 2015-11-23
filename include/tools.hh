@@ -13,7 +13,6 @@ std::string getTimeString();
 int64_t getUnixEpoch();
 std::string getLabel(struct iterator_state* state);
 
-
 // trim whitespace from start
 void ltrim(std::string &s);
 

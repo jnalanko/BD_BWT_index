@@ -8,7 +8,7 @@ using namespace std;
 template<class t_bitvector>
 void BD_BWT_index_iterator<t_bitvector>::push_right_maximal_children(Stack_frame f){
     for(uint8_t c : index->get_alphabet()){
-        if(c == '$') continue;
+        if(c == BD_BWT_index<t_bitvector>::END) continue;
         Interval_pair child = index->left_extend(f.intervals,c);
         if(child.forward.size() == 0) continue; // Extension not possible
         if(index->is_right_maximal(child)){
@@ -49,7 +49,7 @@ bool BD_BWT_index_iterator<t_bitvector>::next(){
     current = iteration_stack.back(); iteration_stack.pop_back();
     update_label(current);
     push_right_maximal_children(current);
-    
+        
     return true;
 }
 

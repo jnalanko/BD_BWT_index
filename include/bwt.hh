@@ -3,6 +3,6 @@
 
 #include <string>
 
-char* bwt_dbwt(char* text);
+uint8_t* bwt_dbwt(uint8_t* text, int64_t length, uint8_t end_char);
 
 #endif

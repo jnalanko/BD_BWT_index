@@ -11,13 +11,13 @@ extern "C" {
 
 using namespace std;
 
-char* bwt_dbwt(char* text){
+uint8_t* bwt_dbwt(uint8_t* text, int64_t length, uint8_t end_char){
 
     unsigned int last;
-    long n = strlen(text);
-    char* d = (char*)dbwt_bwt((uchar*)text, n, &last, 0);
-    d = (char*)realloc(d, (n + 2) * sizeof(char));
-    d[last] = '$';
+    int64_t n = length;
+    uint8_t* d = dbwt_bwt(text, n, &last, 0);
+    d = (uint8_t*)realloc(d, (n + 2) * sizeof(uint8_t));
+    d[last] = end_char;
     d[n + 1] = 0;
 
     return d;

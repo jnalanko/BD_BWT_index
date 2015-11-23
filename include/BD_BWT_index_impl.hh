@@ -20,7 +20,7 @@ int64_t compute_cumulative_char_rank_in_interval(const wt_huff<t_bitvector>& wt,
     if(I.size() == 0) return 0;
     
     // Sum of ranks of all characters that are lexicographically smaller than c
-    for(char d : alphabet){
+    for(uint8_t d : alphabet){
         if(d == c) break;
         ans += wt.rank(I.right + 1,d) - wt.rank(I.left,d);
     }
@@ -64,7 +64,7 @@ void get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I, int_vector
 // Takes a backward step in the forward bwt
 template<class t_bitvector>
 int64_t BD_BWT_index<t_bitvector>::backward_step(int64_t pos){
-    char c = forward_bwt[pos];
+    uint8_t c = forward_bwt[pos];
     return cumulative_char_count[c] + forward_bwt.rank(pos, c);
 }
 
@@ -151,65 +151,84 @@ bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I){
     
     // An interval is right-maximal iff it has more than one possible right extension
     vector<uint8_t> symbols = get_interval_symbols(reverse_bwt, I.reverse);
-    return (symbols.size() >= 2 || (I.reverse.size() >= 2 && symbols[0] == '$')); // TODO: don't hardcode the dollar
+    return (symbols.size() >= 2);
 }
 
 template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I){ // UNTESTED
+bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I){
     
     // An interval is left-maximal iff it has more than one possible left extension
     vector<uint8_t> symbols = get_interval_symbols(forward_bwt, I.forward);
-    return (symbols.size() >= 2 || (I.forward.size() >= 2 && symbols[0] == '$')); // TODO: don't hardcode the dollar
+    return (symbols.size() >= 2);
 }
 
 // Returns the alphabet sorted order
-vector<uint8_t> get_string_alphabet(const string& s){
+vector<uint8_t> get_string_alphabet(const uint8_t* s){
     
     vector<bool> found(256,false);
-    for(uint8_t c : s) found[c] = true;
+    while(*s != 0){
+        found[*s] = true;
+        s++;
+    }
+
     vector<uint8_t> alphabet;
     for(int i = 0; i < 256; i++){
-        if(found[i]) alphabet.push_back((char)i);
+        if(found[i]) alphabet.push_back((uint8_t)i);
     }
     
     return alphabet;
 }
 
+// strlen(const uint8_t*) is not in the standard library
+static int64_t strlen(const uint8_t* str){
+    const uint8_t* start = str;
+    while(*str != 0) str++;
+    return str - start;
+}
+
 template<class t_bitvector>
-BD_BWT_index<t_bitvector>::BD_BWT_index(const string& input){
-    if(input == "") throw std::runtime_error("Tried to construct BD_BWT_index for an empty string");
-    this->alphabet = get_string_alphabet(input);
+BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input){
+    if(*input == 0) throw std::runtime_error("Tried to construct BD_BWT_index for an empty string");
+    int64_t n = strlen(input);
     
-    // If the dollar is not in the input already, add it to the alphabet
-    if(find(alphabet.begin(), alphabet.end(), '$') == alphabet.end()){
-        alphabet.push_back('$');
-        sort(alphabet.begin(), alphabet.end());
+    if(find(input, input+n, END) != input + n){
+        stringstream error;
+        error << "Input string contains forbidden byte " << std::hex << END;
+        throw std::runtime_error(error.str());
     }
     
     // Build the two bwts
-    char* forward = (char*) malloc(input.size() + 1);
-    char* backward = (char*) malloc(input.size() + 1);
-    for(int i = 0; i < input.size(); i++){
+    uint8_t* forward = (uint8_t*) malloc(sizeof(uint8_t) * (n + 1));
+    uint8_t* backward = (uint8_t*) malloc(sizeof(uint8_t) * (n + 1));
+    for(int64_t i = 0; i < n; i++){
         forward[i] = input[i];
-        backward[input.size()-1-i] = input[i];
+        backward[n-1-i] = input[i];
     }
-    forward[input.size()] = 0;
-    backward[input.size()] = 0;
+    forward[n] = END;
+    backward[n] = END;
 
-    char* forward_transform = bwt_dbwt(forward);
-    char* backward_transform = bwt_dbwt(backward);
+    uint8_t* forward_transform = bwt_dbwt(forward,n,END);
     free(forward);
+    
+    //for(int i = 0; i < n+1; i++) cout << (int)forward_transform[i] << " "; cout << endl;
+    
+    uint8_t* backward_transform = bwt_dbwt(backward,n,END);
     free(backward);
     
     // Build wavelet trees
-    construct_im(this->forward_bwt, string(forward_transform).c_str(), 1); // Not casting through std::string segfaults
-    construct_im(this->reverse_bwt, string(backward_transform).c_str(), 1); // Not casting through std::string segfaults
+    construct_im(this->forward_bwt, (const char*)forward_transform, 1); // Must cast to signed char* or else breaks. File a bug report to sdsl?
+    construct_im(this->reverse_bwt, (const char*)backward_transform, 1); // Must cast to signed char* or else breaks. File a bug report to sdsl?
+    
+    this->alphabet = get_string_alphabet(forward_transform);
+    
     free(forward_transform);
-    free(backward_transform);
+    free(backward_transform); 
     
     // Compute cumulative character counts
     this->cumulative_char_count.resize(256);
     count_smaller_chars(forward_bwt,alphabet,cumulative_char_count,Interval(0,forward_bwt.size()-1));
+    
+
 }
 
 template<class t_bitvector>

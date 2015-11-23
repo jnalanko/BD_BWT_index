@@ -51,7 +51,7 @@ vector<string> all_binary_strings_up_to(int k){
 
 
 bool test_suffix_link_tree_iteration(string& s){
-    BD_BWT_index<sdsl::bit_vector> index(s);
+    BD_BWT_index<sdsl::bit_vector> index((const uint8_t*)s.c_str());
     BD_BWT_index_iterator<sdsl::bit_vector> it(&index);
     set<string> labels;
     while(it.next()){
@@ -73,6 +73,4 @@ int main(int argc, char** argv){
     
     cerr << "All tests OK" << endl;
     
-    //BD_BWT_index_iterator(BD_BWT_index<t_bitvector>* index) : index(index), char_counts(256) {
-    //void initialize_index_internal_memory(BD_BWT_index<t_bitvector>& index, std::string& input);
 }

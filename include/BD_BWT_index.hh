@@ -13,6 +13,8 @@
 template<class t_bitvector>
 class BD_BWT_index{
 private:
+    
+    
     sdsl::wt_huff<t_bitvector> forward_bwt;
     sdsl::wt_huff<t_bitvector> reverse_bwt;
     
@@ -23,12 +25,14 @@ private:
     Interval_pair left_extend(Interval_pair intervals, char c, int64_t cumul_rank_c);
     Interval_pair right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c);
 public:
-    
-    BD_BWT_index(const std::string& input);
+
+    // The input string must not contain the END byte
+    static const uint8_t END = 0x01; // End of string marker.
+    BD_BWT_index(const uint8_t* input);
     
     int64_t size() { return forward_bwt.size(); }
-    char forward_bwt_at(int64_t index) { return forward_bwt[index]; }
-    char backward_bwt_at(int64_t index) { return reverse_bwt[index]; }
+    uint8_t forward_bwt_at(int64_t index) { return forward_bwt[index]; }
+    uint8_t backward_bwt_at(int64_t index) { return reverse_bwt[index]; }
     std::vector<int64_t> get_cumulative_char_count() { return cumulative_char_count; }
     const std::vector<uint8_t>& get_alphabet() { return alphabet; }
 

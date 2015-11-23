@@ -21,7 +21,7 @@ public:
     public:
         Interval_pair intervals;  // forward interval, reverse interval
         int64_t depth; // depth in the suffix link tree
-        char extension; // the label on the arc between this node and its parent
+        uint8_t extension; // the label on the arc between this node and its parent
         Stack_frame(Interval_pair intervals, int64_t depth, char extension) : intervals(intervals), depth(depth), extension(extension) {}
         Stack_frame(){}
     };
