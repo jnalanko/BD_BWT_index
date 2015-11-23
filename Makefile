@@ -31,7 +31,7 @@ build/%.o : %.cpp | build
 	
 dbwt/%.o: dbwt/%.c
 	$(CC) $(ccflags) -I dbwt -c $< -o $@
-
+	
 build:
 	@mkdir build -p
 	
