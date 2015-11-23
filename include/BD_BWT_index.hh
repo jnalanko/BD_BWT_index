@@ -14,7 +14,7 @@
  * All intervals are inclusive, i.e. the interval from i to j includes both i and j.
  */
 
-template<class t_bitvector>
+template<class t_bitvector = sdsl::bit_vector>
 class BD_BWT_index{
     
 private:

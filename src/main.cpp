@@ -99,7 +99,7 @@ int main(int argc, char** argv){
     for(auto& s : test_set){
         if(s == "") continue;
         cout << s << endl;
-        BD_BWT_index<sdsl::bit_vector> index((const uint8_t*)s.c_str());
+        BD_BWT_index<> index((const uint8_t*)s.c_str());
         assert(test_suffix_link_tree_iteration(index,s));
         assert(test_backward_step(index,s));
         assert(test_forward_step(index,s));
