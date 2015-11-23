@@ -2,7 +2,7 @@ sources = main.cpp bwt.cpp tools.cpp
 dbwt_sources=dbwt/dbwt.c dbwt/dbwt_queue.c dbwt/dbwt_utils.c dbwt/sais.c
 lib_paths=-L sdsl-lite/build/lib -L sdsl-lite/build/external/libdivsufsort/lib/ -L lib
 includes=-I sdsl-lite/include -I sdsl-lite/build/external/libdivsufsort/include -I include -I dbwt
-cxxflags = -std=c++11 -O3 -MMD
+cxxflags = -std=c++11 -O3 -g -MMD
 ccflags = -std=c99 -O3 -g -MMD
 link = -pthread -fopenmp -ldivsufsort64 -lsdsl
 
