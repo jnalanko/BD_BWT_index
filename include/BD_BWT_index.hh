@@ -20,7 +20,6 @@ template<class t_bitvector>
 class BD_BWT_index{
 private:
     
-    
     sdsl::wt_huff<t_bitvector> forward_bwt;
     sdsl::wt_huff<t_bitvector> reverse_bwt;
     
@@ -30,6 +29,14 @@ private:
     
     Interval_pair left_extend(Interval_pair intervals, char c, int64_t cumul_rank_c) const;
     Interval_pair right_extend(Interval_pair intervals, char c, int64_t cumul_rank_c) const;
+    std::vector<uint8_t> get_string_alphabet(const uint8_t* s) const;
+    int64_t strlen(const uint8_t* str) const;
+    int64_t compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, char c, Interval I) const;
+    std::vector<uint8_t> get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I) const;
+    void get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, 
+                              std::vector<uint8_t>& symbols, std::vector<uint64_t>& ranks_i, std::vector<uint64_t>& ranks_j) const;
+    void count_smaller_chars(const sdsl::wt_huff<t_bitvector>& bwt, std::vector<uint8_t>& alphabet, std::vector<int64_t>& counts, Interval I) const;
+
 public:
 
     // The input string must not contain the END byte
@@ -39,7 +46,7 @@ public:
     int64_t size() const { return forward_bwt.size();}
     uint8_t forward_bwt_at(int64_t index) const { return forward_bwt[index]; }
     uint8_t backward_bwt_at(int64_t index) const { return reverse_bwt[index]; }
-    std::vector<int64_t> get_cumulative_char_count() const { return cumulative_char_count; }
+    const std::vector<int64_t>& get_cumulative_char_count() const { return cumulative_char_count; }
     const std::vector<uint8_t>& get_alphabet() const { return alphabet; }
 
     // Returns an interval of size zero if extension not possible or if the given interval has size 0

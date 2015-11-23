@@ -15,7 +15,7 @@ using namespace sdsl;
 using namespace std;
 
 template<class t_bitvector>
-int64_t compute_cumulative_char_rank_in_interval(const wt_huff<t_bitvector>& wt, vector<uint8_t> alphabet, char c, Interval I){
+int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(const wt_huff<t_bitvector>& wt, char c, Interval I) const{
     int64_t ans = 0;
     if(I.size() == 0) return 0;
     
@@ -29,7 +29,7 @@ int64_t compute_cumulative_char_rank_in_interval(const wt_huff<t_bitvector>& wt,
 
 
 template<class t_bitvector>
-vector<uint8_t> get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I){
+vector<uint8_t> BD_BWT_index<t_bitvector>::get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I) const{
     if(I.size() == 0){
         vector<uint8_t> empty;
         return empty;
@@ -50,8 +50,8 @@ vector<uint8_t> get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I)
 // to ranks_i and ranks_j. Important: All the parameter vectors must have length at least equal to the size
 // of the alphabet of the given wavelet tree. Symbols is not sorted
 template<class t_bitvector>
-void get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I, int_vector_size_type& nExtensions, vector<uint8_t>& symbols,
- vector<uint64_t>& ranks_i, vector<uint64_t>& ranks_j){
+void BD_BWT_index<t_bitvector>::get_interval_symbols(const wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, vector<uint8_t>& symbols,
+ vector<uint64_t>& ranks_i, vector<uint64_t>& ranks_j) const{
     if(I.size() == 0){
         nExtensions = 0;
         return;
@@ -77,13 +77,13 @@ int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank) const{
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c) const{
-    int64_t cumul_rank_c = compute_cumulative_char_rank_in_interval(forward_bwt, alphabet, c, intervals.forward);
+    int64_t cumul_rank_c = compute_cumulative_char_rank_in_interval(forward_bwt, c, intervals.forward);
     return left_extend(intervals,c,cumul_rank_c);
 }
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c) const{
-    int64_t cumul_rank_c = compute_cumulative_char_rank_in_interval(reverse_bwt, alphabet, c, intervals.reverse);
+    int64_t cumul_rank_c = compute_cumulative_char_rank_in_interval(reverse_bwt, c, intervals.reverse);
     return right_extend(intervals,c,cumul_rank_c);
 }
 
@@ -138,7 +138,7 @@ Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, c
 // Assumes alphabet is sorted
 // Counts = vector with 256 elements
 template<class t_bitvector>
-void count_smaller_chars(const wt_huff<t_bitvector>& bwt, vector<uint8_t>& alphabet, vector<int64_t>& counts, Interval I){
+void BD_BWT_index<t_bitvector>::count_smaller_chars(const wt_huff<t_bitvector>& bwt, vector<uint8_t>& alphabet, vector<int64_t>& counts, Interval I) const{
     assert(alphabet.size() != 0);
     counts[alphabet[0]] = 0;
     if(I.size() == 0){
@@ -169,8 +169,9 @@ bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I) const{
     return (symbols.size() >= 2);
 }
 
-// Returns the alphabet sorted order
-vector<uint8_t> get_string_alphabet(const uint8_t* s){
+// Returns the alphabet in sorted order
+template<class t_bitvector>
+vector<uint8_t> BD_BWT_index<t_bitvector>::get_string_alphabet(const uint8_t* s) const{
     
     vector<bool> found(256,false);
     while(*s != 0){
@@ -187,7 +188,8 @@ vector<uint8_t> get_string_alphabet(const uint8_t* s){
 }
 
 // strlen(const uint8_t*) is not in the standard library
-static int64_t strlen(const uint8_t* str){
+template<class t_bitvector>
+int64_t BD_BWT_index<t_bitvector>::strlen(const uint8_t* str) const{
     const uint8_t* start = str;
     while(*str != 0) str++;
     return str - start;
@@ -235,14 +237,3 @@ BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input){
     
 
 }
-
-template<class t_bitvector>
-bool allDistinct(const wt_huff<t_bitvector>& bwt, Interval I){
-    return get_interval_symbols<t_bitvector>(bwt,I).size() == I.size();
-}
-
-template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::interval_is_supermaximal(Interval_pair I) const{
-    return allDistinct(forward_bwt,I.forward) && allDistinct(reverse_bwt,I.reverse);
-}
-
