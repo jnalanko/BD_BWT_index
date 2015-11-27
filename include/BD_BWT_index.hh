@@ -71,6 +71,9 @@ public:
 };
 
 template<class t_bitvector>
+const uint8_t BD_BWT_index<t_bitvector>::END;
+
+template<class t_bitvector>
 int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, char c, Interval I) const{
     int64_t ans = 0;
     if(I.size() == 0) return 0;
