@@ -32,7 +32,7 @@ private:
     
     std::vector<uint8_t> get_string_alphabet(const uint8_t* s) const;
     int64_t strlen(const uint8_t* str) const;
-    int64_t compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, char c, Interval I) const;
+    int64_t compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, uint8_t c, Interval I) const;
     std::vector<uint8_t> get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I) const;
     void get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, 
                               std::vector<uint8_t>& symbols, std::vector<uint64_t>& ranks_i, std::vector<uint64_t>& ranks_j) const;
@@ -63,16 +63,16 @@ public:
 	// Internally, the function computes the local C-array of the interval. 
 	// To avoid recomputing the local C-array multiple times for the same interval, 
 	// use the version of the function that takes the C-array as a parameter.
-    Interval_pair left_extend(Interval_pair intervals, char c) const;
+    Interval_pair left_extend(Interval_pair intervals, uint8_t c) const;
 	
 	// A version of left_extend that takes a precomputed local forward c-array as a parameter. Useful
 	// to avoid recomputing the same local c-array for the same interval.
-	Interval_pair left_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const;
+	Interval_pair left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
 
 	// Analogous right extensions to left extensions
-	Interval_pair right_extend(Interval_pair intervals, char c) const;
+	Interval_pair right_extend(Interval_pair intervals, uint8_t c) const;
 	// Takes a precomputed local reverse c-array as a parameter.
-	Interval_pair right_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const;
+	Interval_pair right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
 
     // Let s be a suffix of length k with lexicographic rank lex_rank among all suffixes of the input string.
     // Returns the lexicographic rank of the suffix with length k+1 if k is not equal to the length of the
@@ -106,7 +106,7 @@ void BD_BWT_index<t_bitvector>::compute_local_c_array_reverse(Interval& interval
 }
 
 template<class t_bitvector>
-int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, char c, Interval I) const{
+int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, uint8_t c, Interval I) const{
     int64_t ans = 0;
     if(I.size() == 0) return 0;
     
@@ -167,21 +167,21 @@ int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank) const{
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c) const{
+Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c) const{
 	std::vector<int64_t> local_c_array(256);
 	compute_local_c_array_forward(intervals.forward, local_c_array);
     return left_extend(intervals,c,local_c_array);
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c) const{
+Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c) const{
 	std::vector<int64_t> local_c_array(256);
 	compute_local_c_array_reverse(intervals.reverse, local_c_array);
     return right_extend(intervals,c,local_c_array);
 }
 
-template<class t_bitvector> // TODO: char -> uint8_t
-Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const{
+template<class t_bitvector>
+Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const{
 	assert(local_c_array.size() >= 256);
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
@@ -204,7 +204,7 @@ Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, ch
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const{
+Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const{
 	assert(local_c_array.size() >= 256);
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
