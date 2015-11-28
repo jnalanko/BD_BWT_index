@@ -32,9 +32,9 @@ public:
     std::string label; // The string on the path from the root to the current node
     
     // Reused space between iterations
-    std::vector<int64_t> char_counts;
+    std::vector<int64_t> local_c_array;
     
-    BD_BWT_index_iterator(const BD_BWT_index<t_bitvector>* index) : index(index), char_counts(256) {
+    BD_BWT_index_iterator(const BD_BWT_index<t_bitvector>* index) : index(index), local_c_array(256) {
         Interval empty_string(0,index->size()-1);
         iteration_stack.push_back(Stack_frame(Interval_pair(empty_string,empty_string), 0, 0));
         current = iteration_stack.back();
@@ -65,11 +65,13 @@ private:
 };
 
 
+// 	Interval_pair left_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const;
 template<class t_bitvector>
 void BD_BWT_index_iterator<t_bitvector>::push_right_maximal_children(Stack_frame f){
+	index->compute_local_c_array_forward(f.intervals.forward, local_c_array);
     for(uint8_t c : index->get_alphabet()){
         if(c == BD_BWT_index<t_bitvector>::END) continue;
-        Interval_pair child = index->left_extend(f.intervals,c);
+        Interval_pair child = index->left_extend(f.intervals,c,local_c_array);
         if(child.forward.size() == 0) continue; // Extension not possible
         if(index->is_right_maximal(child)){
             // Add child to stack
