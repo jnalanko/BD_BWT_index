@@ -50,29 +50,29 @@ public:
     const std::vector<int64_t>& get_global_c_array() const { return global_c_array; }
     const std::vector<uint8_t>& get_alphabet() const { return alphabet; }
 
-	// Computes the local C-array of the given forward interval into the parameter vector. The size
-	// of the parameter vector must be at least 256
-	void compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array) const;
+    // Computes the local C-array of the given forward interval into the parameter vector. The size
+    // of the parameter vector must be at least 256
+    void compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array) const;
 
-	// Computes the local C-array of the given reverse interval into the parameter vector. The size
-	// of the parameter vector must be at least 256
-	void compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array) const;
+    // Computes the local C-array of the given reverse interval into the parameter vector. The size
+    // of the parameter vector must be at least 256
+    void compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array) const;
 
     // Computes the interval pair of the left extension of the given intervals by the character c.
     // Returns an interval of size zero if the extension is not possible or if the given interval has size 0.
-	// Internally, the function computes the local C-array of the interval. 
-	// To avoid recomputing the local C-array multiple times for the same interval, 
-	// use the version of the function that takes the C-array as a parameter.
+    // Internally, the function computes the local C-array of the interval. 
+    // To avoid recomputing the local C-array multiple times for the same interval, 
+    // use the version of the function that takes the C-array as a parameter.
     Interval_pair left_extend(Interval_pair intervals, uint8_t c) const;
-	
-	// A version of left_extend that takes a precomputed local forward c-array as a parameter. Useful
-	// to avoid recomputing the same local c-array for the same interval.
-	Interval_pair left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
+    
+    // A version of left_extend that takes a precomputed local forward c-array as a parameter. Useful
+    // to avoid recomputing the same local c-array for the same interval.
+    Interval_pair left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
 
-	// Analogous right extensions to left extensions
-	Interval_pair right_extend(Interval_pair intervals, uint8_t c) const;
-	// Takes a precomputed local reverse c-array as a parameter.
-	Interval_pair right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
+    // Analogous right extensions to left extensions
+    Interval_pair right_extend(Interval_pair intervals, uint8_t c) const;
+    // Takes a precomputed local reverse c-array as a parameter.
+    Interval_pair right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
 
     // Let s be a suffix of length k with lexicographic rank lex_rank among all suffixes of the input string.
     // Returns the lexicographic rank of the suffix with length k+1 if k is not equal to the length of the
@@ -95,13 +95,13 @@ const uint8_t BD_BWT_index<t_bitvector>::END;
 
 template<class t_bitvector>
 void BD_BWT_index<t_bitvector>::compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array) const{
-	assert(c_array.size() >= 256);
+    assert(c_array.size() >= 256);
     count_smaller_chars(forward_bwt, c_array, interval);
 }
 
 template<class t_bitvector>
 void BD_BWT_index<t_bitvector>::compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array) const{
-	assert(c_array.size() >= 256);
+    assert(c_array.size() >= 256);
     count_smaller_chars(reverse_bwt, c_array, interval);
 }
 
@@ -168,21 +168,21 @@ int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank) const{
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c) const{
-	std::vector<int64_t> local_c_array(256);
-	compute_local_c_array_forward(intervals.forward, local_c_array);
+    std::vector<int64_t> local_c_array(256);
+    compute_local_c_array_forward(intervals.forward, local_c_array);
     return left_extend(intervals,c,local_c_array);
 }
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c) const{
-	std::vector<int64_t> local_c_array(256);
-	compute_local_c_array_reverse(intervals.reverse, local_c_array);
+    std::vector<int64_t> local_c_array(256);
+    compute_local_c_array_reverse(intervals.reverse, local_c_array);
     return right_extend(intervals,c,local_c_array);
 }
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const{
-	assert(local_c_array.size() >= 256);
+    assert(local_c_array.size() >= 256);
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
     
@@ -205,15 +205,15 @@ Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, ui
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const{
-	assert(local_c_array.size() >= 256);
+    assert(local_c_array.size() >= 256);
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
     
     Interval forward = intervals.forward;
     Interval reverse = intervals.reverse;
-	
+    
     // Compute the new reverse interval
-	int64_t num_c_in_interval = reverse_bwt.rank(reverse.right + 1,c) - reverse_bwt.rank(reverse.left,c);
+    int64_t num_c_in_interval = reverse_bwt.rank(reverse.right + 1,c) - reverse_bwt.rank(reverse.left,c);
     int64_t start_r_new = get_global_c_array()[c] + reverse_bwt.rank(reverse.left, c); // Start in reverse
     int64_t end_r_new = start_r_new + num_c_in_interval - 1; // End in reverse
 

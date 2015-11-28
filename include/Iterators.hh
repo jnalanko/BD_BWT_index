@@ -65,10 +65,10 @@ private:
 };
 
 
-// 	Interval_pair left_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const;
+//  Interval_pair left_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const;
 template<class t_bitvector>
 void BD_BWT_index_iterator<t_bitvector>::push_right_maximal_children(Stack_frame f){
-	index->compute_local_c_array_forward(f.intervals.forward, local_c_array);
+    index->compute_local_c_array_forward(f.intervals.forward, local_c_array);
     for(uint8_t c : index->get_alphabet()){
         if(c == BD_BWT_index<t_bitvector>::END) continue;
         Interval_pair child = index->left_extend(f.intervals,c,local_c_array);
