@@ -86,7 +86,6 @@ public:
     
     bool is_right_maximal(Interval_pair I) const;
     bool is_left_maximal(Interval_pair I) const;
-    bool interval_is_supermaximal(Interval_pair I) const;
 
 };
 
