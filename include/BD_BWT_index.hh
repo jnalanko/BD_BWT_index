@@ -26,7 +26,7 @@ private:
         
     sdsl::wt_huff<t_bitvector> forward_bwt;
     sdsl::wt_huff<t_bitvector> reverse_bwt;
-    
+
     std::vector<int64_t> global_c_array;
     std::vector<uint8_t> alphabet;
     
@@ -63,6 +63,7 @@ public:
     // Internally, the function computes the local C-array of the interval. 
     // To avoid recomputing the local C-array multiple times for the same interval, 
     // use the version of the function that takes the C-array as a parameter.
+    // NOT THREAD SAFE
     Interval_pair left_extend(Interval_pair intervals, uint8_t c) const;
     
     // A version of left_extend that takes a precomputed local forward c-array as a parameter. Useful
@@ -70,6 +71,7 @@ public:
     Interval_pair left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
 
     // Analogous right extensions to left extensions
+    // NOT THREAD SAFE
     Interval_pair right_extend(Interval_pair intervals, uint8_t c) const;
     // Takes a precomputed local reverse c-array as a parameter.
     Interval_pair right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
@@ -167,14 +169,15 @@ int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank) const{
 
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c) const{
-    std::vector<int64_t> local_c_array(256);
+    static std::vector<int64_t> local_c_array(256); // NOT THREAD SAFE
     compute_local_c_array_forward(intervals.forward, local_c_array);
     return left_extend(intervals,c,local_c_array);
 }
 
+
 template<class t_bitvector>
 Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c) const{
-    std::vector<int64_t> local_c_array(256);
+    static std::vector<int64_t> local_c_array(256); // NOT THREAD SAFE
     compute_local_c_array_reverse(intervals.reverse, local_c_array);
     return right_extend(intervals,c,local_c_array);
 }
