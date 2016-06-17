@@ -1,3 +1,5 @@
+Only supports inputs up to size 2^31 - 1 bytes
+
 First compile sdsl-lite with:
 
 git submodule init
