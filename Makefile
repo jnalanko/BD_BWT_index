@@ -65,10 +65,10 @@ dbwt/%.o: dbwt/%.c
 	$(CC) $(ccflags) -I dbwt -c $< -o $@
 
 build:
-	@mkdir build -p
+	@mkdir -p build
 	
 lib:
-	@mkdir lib -p
+	@mkdir -p lib
 	
 tests: install
 	$(CXX) src/main.cpp $(lib_path) $(link) $(includes) $(cxxflags) -o tests
