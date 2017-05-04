@@ -69,7 +69,8 @@ private:
 template<class t_bitvector>
 void BD_BWT_index_iterator<t_bitvector>::push_right_maximal_children(Stack_frame f){
     index->compute_local_c_array_forward(f.intervals.forward, local_c_array);
-    for(uint8_t c : index->get_alphabet()){
+    for(int64_t i = index->get_alphabet().size()-1; i >= 0; i--){
+        uint8_t c = index->get_alphabet()[i];
         if(c == BD_BWT_index<t_bitvector>::END) continue;
         Interval_pair child = index->left_extend(f.intervals,c,local_c_array);
         if(child.forward.size() == 0) continue; // Extension not possible
