@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <utility>
 
 class Interval{
 public:
@@ -11,6 +12,7 @@ public:
     Interval() {}
     friend bool operator== (const Interval& x, const Interval& y);
     friend bool operator!= (const Interval& x, const Interval& y);
+    friend bool operator<(const Interval& x, const Interval& y);
     int64_t size() const{
         return right - left + 1;
     }
@@ -29,6 +31,10 @@ bool operator!= (const Interval& x, const Interval& y){
     return !(x == y);
 }
 
+bool operator<(const Interval& x, const Interval& y){
+    return std::make_pair(x.left,x.right) < std::make_pair(y.left, y.right);
+}
+
 class Interval_pair{
 public:
     Interval forward, reverse;
@@ -41,6 +47,7 @@ public:
     }
     friend bool operator== (const Interval_pair& x, const Interval_pair& y);
     friend bool operator!= (const Interval& x, const Interval& y);
+    friend bool operator<(const Interval& x, const Interval& y);
 };
 
 bool operator== (const Interval_pair& x, const Interval_pair& y){
@@ -49,6 +56,10 @@ bool operator== (const Interval_pair& x, const Interval_pair& y){
 
 bool operator!= (const Interval_pair& x, const Interval_pair& y){
     return !(x == y);
+}
+
+bool operator< (const Interval_pair& x, const Interval_pair& y){
+    return std::make_pair(x.forward, x.reverse) < std::make_pair(y.forward, y.reverse);
 }
 
 #endif
