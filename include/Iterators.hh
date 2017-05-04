@@ -24,7 +24,7 @@ public:
         Stack_frame(){}
     };
     
-    const BD_BWT_index<t_bitvector>* index;
+    BD_BWT_index<t_bitvector>* index;
     
     // Iteration state
     std::deque<Stack_frame> iteration_stack;
@@ -34,7 +34,7 @@ public:
     // Reused space between iterations
     std::vector<int64_t> local_c_array;
     
-    BD_BWT_index_iterator(const BD_BWT_index<t_bitvector>* index) : index(index), local_c_array(256) {
+    BD_BWT_index_iterator(BD_BWT_index<t_bitvector>* index) : index(index), local_c_array(256) {
         Interval empty_string(0,index->size()-1);
         iteration_stack.push_back(Stack_frame(Interval_pair(empty_string,empty_string), 0, 0));
         current = iteration_stack.back();
@@ -68,7 +68,7 @@ private:
 //  Interval_pair left_extend(Interval_pair intervals, char c, const std::vector<int64_t>& local_c_array) const;
 template<class t_bitvector>
 void BD_BWT_index_iterator<t_bitvector>::push_right_maximal_children(Stack_frame f){
-    index->compute_local_c_array_forward(f.intervals.forward, local_c_array);
+    index->compute_local_c_array_forward(f.intervals.forward,local_c_array);
     for(int64_t i = index->get_alphabet().size()-1; i >= 0; i--){
         uint8_t c = index->get_alphabet()[i];
         if(c == BD_BWT_index<t_bitvector>::END) continue;

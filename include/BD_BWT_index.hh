@@ -30,10 +30,16 @@ private:
     std::vector<int64_t> global_c_array;
     std::vector<uint8_t> alphabet;
     
+    // Space reused between iterations
+    std::vector<int64_t> local_c_array;
+    std::vector<uint8_t> symbols;
+    std::vector<uint64_t> ranks_i;
+    std::vector<uint64_t> ranks_j;
+    
     std::vector<uint8_t> get_string_alphabet(const uint8_t* s) const;
     int64_t strlen(const uint8_t* str) const;
     int64_t compute_cumulative_char_rank_in_interval(const sdsl::wt_huff<t_bitvector>& wt, uint8_t c, Interval I) const;
-    std::vector<uint8_t> get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I) const;
+    int64_t get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I);
     void get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, 
                               std::vector<uint8_t>& symbols, std::vector<uint64_t>& ranks_i, std::vector<uint64_t>& ranks_j) const;
     void count_smaller_chars(const sdsl::wt_huff<t_bitvector>& bwt, std::vector<int64_t>& counts, Interval I) const;
@@ -63,18 +69,16 @@ public:
     // Internally, the function computes the local C-array of the interval. 
     // To avoid recomputing the local C-array multiple times for the same interval, 
     // use the version of the function that takes the C-array as a parameter.
-    // NOT THREAD SAFE
-    Interval_pair left_extend(Interval_pair intervals, uint8_t c) const;
+    Interval_pair left_extend(Interval_pair intervals, uint8_t c);
     
     // A version of left_extend that takes a precomputed local forward c-array as a parameter. Useful
     // to avoid recomputing the same local c-array for the same interval.
-    Interval_pair left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
+    Interval_pair left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array);
 
     // Analogous right extensions to left extensions
-    // NOT THREAD SAFE
-    Interval_pair right_extend(Interval_pair intervals, uint8_t c) const;
+    Interval_pair right_extend(Interval_pair intervals, uint8_t c);
     // Takes a precomputed local reverse c-array as a parameter.
-    Interval_pair right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const;
+    Interval_pair right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array);
 
     // Let s be a suffix of length k with lexicographic rank lex_rank among all suffixes of the input string.
     // Returns the lexicographic rank of the suffix with length k+1 if k is not equal to the length of the
@@ -86,8 +90,8 @@ public:
     // input string counting the terminating symbol, or the colexicographic rank of the prefix with length 0 otherwise.
     int64_t forward_step(int64_t colex_rank) const;
     
-    bool is_right_maximal(Interval_pair I) const;
-    bool is_left_maximal(Interval_pair I) const;
+    bool is_right_maximal(Interval_pair I);
+    bool is_left_maximal(Interval_pair I);
 
 };
 
@@ -120,20 +124,17 @@ int64_t BD_BWT_index<t_bitvector>::compute_cumulative_char_rank_in_interval(cons
 }
 
 
+// Returns the number of distinct symbols and stores them in this->symbols without resizising this->symbols
 template<class t_bitvector>
-std::vector<uint8_t> BD_BWT_index<t_bitvector>::get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I) const{
+int64_t BD_BWT_index<t_bitvector>::get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I){
     if(I.size() == 0){
         std::vector<uint8_t> empty;
-        return empty;
+        return 0;
     }
     
     sdsl::int_vector_size_type nExtensions;
-    std::vector<uint8_t> symbols(wt.sigma);
-    std::vector<uint64_t> ranks_i(wt.sigma);
-    std::vector<uint64_t> ranks_j(wt.sigma);
-    wt.interval_symbols(I.left, I.right+1, nExtensions, symbols, ranks_i, ranks_j);
-    while(symbols.size() > nExtensions) symbols.pop_back();
-    return symbols;
+    wt.interval_symbols(I.left, I.right+1, nExtensions, this->symbols, this->ranks_i, this->ranks_j);
+    return nExtensions;
 }
 
 // Another version of get_interval_symbols when the allocation of a new vector is too slow.
@@ -168,22 +169,20 @@ int64_t BD_BWT_index<t_bitvector>::forward_step(int64_t colex_rank) const{
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c) const{
-    static std::vector<int64_t> local_c_array(256); // NOT THREAD SAFE
+Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c){
     compute_local_c_array_forward(intervals.forward, local_c_array);
     return left_extend(intervals,c,local_c_array);
 }
 
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c) const{
-    static std::vector<int64_t> local_c_array(256); // NOT THREAD SAFE
+Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c){
     compute_local_c_array_reverse(intervals.reverse, local_c_array);
     return right_extend(intervals,c,local_c_array);
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const{
+Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array){
     assert(local_c_array.size() >= 256);
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
@@ -206,7 +205,7 @@ Interval_pair BD_BWT_index<t_bitvector>::left_extend(Interval_pair intervals, ui
 }
 
 template<class t_bitvector>
-Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array) const{
+Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, uint8_t c, const std::vector<int64_t>& local_c_array){
     assert(local_c_array.size() >= 256);
     if(intervals.forward.size() == 0)
         return Interval_pair(-1,-2,-1,-2);
@@ -251,15 +250,15 @@ void BD_BWT_index<t_bitvector>::count_smaller_chars(const sdsl::wt_huff<t_bitvec
 }
 
 template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I) const{
+bool BD_BWT_index<t_bitvector>::is_right_maximal(Interval_pair I){
     
     // An interval is right-maximal iff it has more than one possible right extension
-    std::vector<uint8_t> symbols = get_interval_symbols(reverse_bwt, I.reverse);
-    return (symbols.size() >= 2);
+    int64_t nSymbols = get_interval_symbols(reverse_bwt, I.reverse);
+    return nSymbols >= 2;
 }
 
 template<class t_bitvector>
-bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I) const{
+bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I){
     
     // An interval is left-maximal iff it has more than one possible left extension
     std::vector<uint8_t> symbols = get_interval_symbols(forward_bwt, I.forward);
@@ -293,7 +292,8 @@ int64_t BD_BWT_index<t_bitvector>::strlen(const uint8_t* str) const{
 }
 
 template<class t_bitvector>
-BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input){
+BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input) 
+    : local_c_array(256), global_c_array(256){
     if(*input == 0) throw std::runtime_error("Tried to construct BD_BWT_index for an empty string");
     int64_t n = strlen(input);
     
@@ -329,8 +329,12 @@ BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input){
     free(backward_transform); 
     
     // Compute cumulative character counts
-    this->global_c_array.resize(256);
     count_smaller_chars(forward_bwt,global_c_array,Interval(0,forward_bwt.size()-1));
+    
+    // Initialize work space
+    symbols.resize(this->alphabet.size());
+    ranks_i.resize(this->alphabet.size());
+    ranks_j.resize(this->alphabet.size());
 }
 
 #endif
