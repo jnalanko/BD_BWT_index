@@ -328,13 +328,13 @@ BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input)
     free(forward_transform);
     free(backward_transform); 
     
-    // Compute cumulative character counts
-    count_smaller_chars(forward_bwt,global_c_array,Interval(0,forward_bwt.size()-1));
-    
     // Initialize work space
     symbols.resize(this->alphabet.size());
     ranks_i.resize(this->alphabet.size());
     ranks_j.resize(this->alphabet.size());
+    
+    // Compute cumulative character counts
+    count_smaller_chars(forward_bwt,global_c_array,Interval(0,forward_bwt.size()-1));
 }
 
 #endif
