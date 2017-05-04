@@ -293,7 +293,7 @@ int64_t BD_BWT_index<t_bitvector>::strlen(const uint8_t* str) const{
 
 template<class t_bitvector>
 BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input) 
-    : local_c_array(256), global_c_array(256){
+    : global_c_array(256), local_c_array(256) {
     if(*input == 0) throw std::runtime_error("Tried to construct BD_BWT_index for an empty string");
     int64_t n = strlen(input);
     
