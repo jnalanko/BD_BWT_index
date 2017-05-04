@@ -9,7 +9,17 @@ cd sdsl-lite
 sh ./install.sh
 ```
 
-Then compile the rest with make at the project root.
+Then compile the rest with:
+
+```
+cmake -DCMAKE_BUILD_TYPE=Release .
+make
+```
+
+or:
+cmake -DCMAKE_BUILD_TYPE=Debug . 
+make
+
 Library files will be compiled into ./lib and
 headers will be installed to ./include
 
