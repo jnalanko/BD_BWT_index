@@ -17,8 +17,10 @@ make
 ```
 
 or:
+```
 cmake -DCMAKE_BUILD_TYPE=Debug . 
 make
+```
 
 Library files will be compiled into ./lib and
 headers will be installed to ./include
