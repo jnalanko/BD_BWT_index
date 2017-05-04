@@ -261,8 +261,8 @@ template<class t_bitvector>
 bool BD_BWT_index<t_bitvector>::is_left_maximal(Interval_pair I){
     
     // An interval is left-maximal iff it has more than one possible left extension
-    std::vector<uint8_t> symbols = get_interval_symbols(forward_bwt, I.forward);
-    return (symbols.size() >= 2);
+    int64_t nSymbols = get_interval_symbols(forward_bwt, I.forward);
+    return nSymbols >= 2;
 }
 
 // Returns the alphabet in sorted order
