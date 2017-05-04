@@ -42,7 +42,7 @@ private:
     int64_t get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I);
     void get_interval_symbols(const sdsl::wt_huff<t_bitvector>& wt, Interval I, sdsl::int_vector_size_type& nExtensions, 
                               std::vector<uint8_t>& symbols, std::vector<uint64_t>& ranks_i, std::vector<uint64_t>& ranks_j) const;
-    void count_smaller_chars(const sdsl::wt_huff<t_bitvector>& bwt, std::vector<int64_t>& counts, Interval I) const;
+    void count_smaller_chars(const sdsl::wt_huff<t_bitvector>& bwt, std::vector<int64_t>& counts, Interval I);
 
 public:
 
@@ -58,11 +58,11 @@ public:
 
     // Computes the local C-array of the given forward interval into the parameter vector. The size
     // of the parameter vector must be at least 256
-    void compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array) const;
+    void compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array);
 
     // Computes the local C-array of the given reverse interval into the parameter vector. The size
     // of the parameter vector must be at least 256
-    void compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array) const;
+    void compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array);
 
     // Computes the interval pair of the left extension of the given intervals by the character c.
     // Returns an interval of size zero if the extension is not possible or if the given interval has size 0.
@@ -99,13 +99,13 @@ template<class t_bitvector>
 const uint8_t BD_BWT_index<t_bitvector>::END;
 
 template<class t_bitvector>
-void BD_BWT_index<t_bitvector>::compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array) const{
+void BD_BWT_index<t_bitvector>::compute_local_c_array_forward(Interval& interval, std::vector<int64_t>& c_array){
     assert(c_array.size() >= 256);
     count_smaller_chars(forward_bwt, c_array, interval);
 }
 
 template<class t_bitvector>
-void BD_BWT_index<t_bitvector>::compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array) const{
+void BD_BWT_index<t_bitvector>::compute_local_c_array_reverse(Interval& interval, std::vector<int64_t>& c_array){
     assert(c_array.size() >= 256);
     count_smaller_chars(reverse_bwt, c_array, interval);
 }
@@ -228,25 +228,39 @@ Interval_pair BD_BWT_index<t_bitvector>::right_extend(Interval_pair intervals, u
     
 }
 
-
-// Compute the cumulative sum of character counts in lexicographical order
+// counts = vector with 256 elements
+// Modifies the counts vector such that:
+// counts[i] = number of characters in interval I that are lexicographically stricly smaller than alphabet[i]
 // Assumes alphabet is sorted
-// Counts = vector with 256 elements
+
 template<class t_bitvector>
 void BD_BWT_index<t_bitvector>::count_smaller_chars(const sdsl::wt_huff<t_bitvector>& bwt, 
-                                                    std::vector<int64_t>& counts, Interval I) const{
+                                                    std::vector<int64_t>& counts, Interval I){
     assert(alphabet.size() != 0);
-    counts[alphabet[0]] = 0;
-    if(I.size() == 0){
-        for(int64_t i = 1; i < alphabet.size(); i++)
-            counts[alphabet[i]] = 0;
-        return;
-    }
+    for(int64_t i = 0; i < (int64_t)alphabet.size(); i++) counts[alphabet[i]] = 0;
+    if(I.size() == 0) return;
     
-    for(int64_t i = 1; i < alphabet.size(); i++){
-        int64_t count_prev = bwt.rank(I.right+1, alphabet[i-1]) - bwt.rank(I.left, alphabet[i-1]);
-        counts[alphabet[i]] = counts[alphabet[i-1]] + count_prev;
-    }
+    sdsl::int_vector_size_type nSymbols;
+    bwt.interval_symbols(I.left, I.right+1, nSymbols, symbols, ranks_i, ranks_j);
+    
+    // Put in the counts
+    for(int64_t k = 0; k < nSymbols; k++){
+        counts[symbols[k]] = ranks_j[k] - ranks_i[k];
+    }    
+    
+    // Do the cumulative sum
+    int64_t prev_cumul = 0;
+    int64_t prev_count = counts[alphabet[0]];
+    int64_t temp = 0;
+    for(int64_t k = 0; k < alphabet.size(); k++){
+        temp = counts[alphabet[k]];
+        if(k == 0) counts[alphabet[k]] = 0;
+        else{
+            counts[alphabet[k]] = prev_cumul + prev_count;
+        }
+        prev_count = temp;
+        prev_cumul = counts[alphabet[k]];
+    }    
 }
 
 template<class t_bitvector>
@@ -327,7 +341,7 @@ BD_BWT_index<t_bitvector>::BD_BWT_index(const uint8_t* input)
     
     free(forward_transform);
     free(backward_transform); 
-    
+        
     // Initialize work space
     symbols.resize(this->alphabet.size());
     ranks_i.resize(this->alphabet.size());
