@@ -1,6 +1,6 @@
-The code in this repository implementes a bidirectional Burrows-Wheeler index. The implementation is loosely based on the paper "Versatile succinct representations of the bidirectional burrows-wheeler transform.", by Belazzougui et al. at the European Symposium on Algorithms 2013.
+The code in this repository implements a bidirectional Burrows-Wheeler index. The implementation is loosely based on the paper "Versatile succinct representations of the bidirectional burrows-wheeler transform", by Belazzougui et al. at the European Symposium on Algorithms 2013.
 
-The code is set of lightweight headers built on top of the sdsl-lite and divsufsort libraries. Both of the
+The library is a set of lightweight headers built on top of the sdsl-lite and divsufsort libraries. Both of the
 dependencies are included inside in the sdsl-lite subdirectory, and they can both be built as follows:
 
 ```
@@ -46,11 +46,11 @@ int main(){
 }
 ```
 
-This code is at example.cpp. The build the example, you need to include the ./include directory, and link against libsdsl, libdivsufsort and libdivsufsort64. This can be done for example as follows:
+This code is at example.cpp. To build the example, you need to include the ./include directory, and link against libsdsl, libdivsufsort and libdivsufsort64. This can be done for example as follows:
 
 ```
 g++ example.cpp -I include -I sdsl-lite/include -I ./sdsl-lite/build/external/libdivsufsort/include -L sdsl-lite/build/lib -lsdsl -L sdsl-lite/build/external/libdivsufsort/lib/ -ldivsufsort -ldivsufsort64 -o example
 ```
 
-Documentation is poor at the moment, but the header include/BD_BWT_index.hh contains some documentation.
+Documentation is poor at the moment. See the comments in the class BD_BWT_index for some information on how to use the class.
 
