@@ -16,10 +16,10 @@ include_directories(include dbwt sdsl-lite/include sdsl-lite/build/external/libd
 set(PROJECT_LINK_LIBS libsdsl.a libdivsufsort64.a libbdbwt.a)
 link_directories(lib sdsl-lite/build/lib sdsl-lite/build/external/libdivsufsort/lib)
 
+add_library(bdbwt ${LIBRARY_SOURCES} ${COMMON_SOURCES})
+
 add_executable(tests ${TEST_SOURCES} ${COMMON_SOURCES})
 target_link_libraries(tests ${PROJECT_LINK_LIBS})
-
-add_library(bdbwt ${LIBRARY_SOURCES} ${COMMON_SOURCES})
 
 # Copy headers to include
 add_custom_command(TARGET bdbwt PRE_BUILD
