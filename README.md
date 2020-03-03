@@ -1,47 +1,21 @@
-Only supports inputs up to size 2^31 - 1 bytes
+The code in this repository implementes a bidirectional Burrows-Wheeler index. The implementation is loosely based on the paper "Versatile succinct representations of the bidirectional burrows-wheeler transform.", by Belazzougui et al. at the European Symposium on Algorithms 2013.
 
-First compile sdsl-lite with:
+The code is set of lightweight headers built on top of the sdsl-lite and divsufsort libraries. Both of the
+dependencies are included inside in the sdsl-lite subdirectory, and they can both be built as follows:
 
 ```
-git submodule init
-git submodule update
 cd sdsl-lite
 sh ./install.sh
 ```
 
-Then compile the rest with:
-
-```
-cmake -DCMAKE_BUILD_TYPE=Release .
-make
-```
-
-or:
-```
-cmake -DCMAKE_BUILD_TYPE=Debug . 
-make
-```
-
-Library files will be compiled into ./lib and
-headers will be installed to ./include
-
-To use the library, link against -lbdbwt -ldbwt -ldivsufsort64 -lsdsl
-For example: 
-
-```
-g++ main.cpp -std=c++11 -L lib -I include -lbdbwt -ldbwt -ldivsufsort64 -lsdsl
-```
-
-The header include/BD_BWT_index.hh contains some documentation.
-
-For example, below is code that iterates all right-maximal
-nodes of the suffix link tree of the string mississippi
+The library can be used by including the BD_BWT_index.hh header. For example, below is code that 
+iterates all right-maximal nodes of the suffix link tree of the string mississippi:
 
 ```
 #include <iostream>
-#include "include/BD_BWT_index.hh"
 #include <string>
 #include <set>
+#include "include/BD_BWT_index.hh"
 
 using namespace std;
 
@@ -72,4 +46,11 @@ int main(){
 }
 ```
 
+This code is at example.cpp. The build the example, you need to include the ./include directory, and link against libsdsl, libdivsufsort and libdivsufsort64. This can be done for example as follows:
+
+```
+g++ example.cpp -I include -I sdsl-lite/include -I ./sdsl-lite/build/external/libdivsufsort/include -L sdsl-lite/build/lib -lsdsl -L sdsl-lite/build/external/libdivsufsort/lib/ -ldivsufsort -ldivsufsort64 -o example
+```
+
+Documentation is poor at the moment, but the header include/BD_BWT_index.hh contains some documentation.
 
