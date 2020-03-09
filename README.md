@@ -49,7 +49,7 @@ int main(){
 This code is at example.cpp. To build the example, you need to include the ./include directory, and link against libsdsl, libdivsufsort and libdivsufsort64. This can be done for example as follows:
 
 ```
-g++ example.cpp -I include -I sdsl-lite/include -I ./sdsl-lite/build/external/libdivsufsort/include -L sdsl-lite/build/lib -lsdsl -L sdsl-lite/build/external/libdivsufsort/lib/ -ldivsufsort -ldivsufsort64 -o example
+g++ example.cpp -I include -I sdsl-lite/include -I ./sdsl-lite/build/external/libdivsufsort/include -L sdsl-lite/build/lib -lsdsl -L sdsl-lite/build/external/libdivsufsort/lib/ -ldivsufsort -ldivsufsort64 -o example -std=c++14
 ```
 
 Documentation is poor at the moment. See the comments in the class BD_BWT_index for some information on how to use the class.
